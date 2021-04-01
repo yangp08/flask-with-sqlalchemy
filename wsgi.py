@@ -23,3 +23,5 @@ def hello():
 def get_many_product():
     products = db.session.query(Product).all() # SQLAlchemy request => 'SELECT * FROM products'
     return many_product_schema.jsonify(products), 200
+
+
