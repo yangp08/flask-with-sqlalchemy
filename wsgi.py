@@ -47,8 +47,27 @@ def delete_one_product(id):
     db.session.commit()
     return "", 204
 
+@app.route(f'{BASE_URL}/products/<int:id>', methods=['PATCH'])
+def update_one_product(id):
+    content = request.get_json()
+    if content is None:
+        abort(400)
+
+    product = db.session.query(Product).get(id)
+    if product is None:
+        abort(422)
+
+    product.name = content['name']
+    db.session.commit()
+    return "", 204
+
+
 @app.route(f'{BASE_URL}/products/<int:id>', methods=['GET'])
 def read_one_product(id):
+    content = request.get_json()
+    if content is None:
+        abort(400)
+
     product = db.session.query(Product).get(id)
     if product is None:
         abort(404)
