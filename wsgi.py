@@ -37,6 +37,16 @@ def post_one_product():
     db.session.commit()
     return one_product_schema.jsonify(product), 201
 
+@app.route(f'{BASE_URL}/products/<int:id>', methods=['DELETE'])
+def delete_one_product(id):
+    product = db.session.query(Product).get(id)
+    if product is None:
+        abort(404)
+
+    db.session.delete(product)
+    db.session.commit()
+    return "", 204
+
 @app.route(f'{BASE_URL}/products/<int:id>', methods=['GET'])
 def read_one_product(id):
     product = db.session.query(Product).get(id)
