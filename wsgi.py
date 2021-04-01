@@ -3,7 +3,7 @@
 
 BASE_URL = '/api/v1'
 
-from flask import Flask
+from flask import Flask, abort
 from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -14,6 +14,7 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 from models import Product
 from schemas import many_product_schema
+from schemas import one_product_schema
 
 @app.route('/hello', methods=['GET'])
 def hello():
@@ -24,4 +25,9 @@ def get_many_product():
     products = db.session.query(Product).all() # SQLAlchemy request => 'SELECT * FROM products'
     return many_product_schema.jsonify(products), 200
 
-
+@app.route(f'{BASE_URL}/products/<int:id>', methods=['GET'])
+def read_one_product(id):
+    product = db.session.query(Product).get(id)
+    if product is None:
+        abort(404)
+    return one_product_schema.jsonify(product), 200
