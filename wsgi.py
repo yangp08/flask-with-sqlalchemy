@@ -3,7 +3,7 @@
 
 BASE_URL = '/api/v1'
 
-from flask import Flask, abort
+from flask import Flask, abort, request
 from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -25,9 +25,23 @@ def get_many_product():
     products = db.session.query(Product).all() # SQLAlchemy request => 'SELECT * FROM products'
     return many_product_schema.jsonify(products), 200
 
+@app.route(f'{BASE_URL}/products', methods=['POST'])
+def post_one_product():
+    content = request.get_json()
+    if content is None:
+        abort(400)
+
+    product = Product()
+    product.name = content['name']
+    db.session.add(product)
+    db.session.commit()
+    return one_product_schema.jsonify(product), 201
+
 @app.route(f'{BASE_URL}/products/<int:id>', methods=['GET'])
 def read_one_product(id):
     product = db.session.query(Product).get(id)
     if product is None:
         abort(404)
     return one_product_schema.jsonify(product), 200
+
+
